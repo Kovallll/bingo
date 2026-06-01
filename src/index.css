@@ -147,6 +147,55 @@ body {
   background: #d1d5db;
 }
 
+.progress-block {
+  max-width: 480px;
+  margin: 0 auto 1.5rem;
+  padding: 0 0.25rem;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.progress-percent {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-track {
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 999px;
+  transition: width 0.15s ease-out;
+}
+
+.preview-hint {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin: -0.75rem 0 1.25rem;
+  max-width: 520px;
+  margin-inline: auto;
+}
+
+.cards-count {
+  font-weight: 500;
+  color: #666;
+  font-size: 0.95em;
+}
+
 .error-message {
   text-align: center;
   color: #b91c1c;
@@ -275,7 +324,7 @@ body {
   height: 100%;
 }
 
-.export-document .bingo-card-export {
+.export-page .bingo-card-export {
   box-shadow: none;
   border-radius: 0;
   background: #fff;
@@ -286,12 +335,12 @@ body {
   justify-content: center;
 }
 
-.export-document .bingo-card-export .bingo-table {
+.export-page .bingo-card-export .bingo-table {
   border-collapse: collapse;
   table-layout: fixed;
 }
 
-.export-document .bingo-card-export .bingo-header {
+.export-page .bingo-card-export .bingo-header {
   font-size: var(--header-font);
   font-weight: 600;
   color: #888;
@@ -302,7 +351,7 @@ body {
   background: transparent;
 }
 
-.export-document .bingo-card-export .bingo-cell {
+.export-page .bingo-card-export .bingo-cell {
   width: var(--cell-size);
   height: var(--cell-size);
   min-width: var(--cell-size);
@@ -314,7 +363,7 @@ body {
   box-sizing: border-box;
 }
 
-.export-document .bingo-card-export .bingo-cell.free-cell {
+.export-page .bingo-card-export .bingo-cell.free-cell {
   font-size: calc(var(--cell-font) * 0.9);
   font-weight: 600;
 }
@@ -326,7 +375,7 @@ body {
   align-items: center;
 }
 
-.export-document .caller-sheet-export {
+.export-page .caller-sheet-export {
   box-shadow: none;
   border-radius: 0;
   background: #fff;
@@ -341,12 +390,12 @@ body {
   align-items: center;
 }
 
-.export-document .caller-sheet-export .caller-table {
+.export-page .caller-sheet-export .caller-table {
   border-collapse: collapse;
   table-layout: fixed;
 }
 
-.export-document .caller-sheet-export .caller-cell {
+.export-page .caller-sheet-export .caller-cell {
   width: var(--caller-cell-size);
   height: var(--caller-cell-size);
   min-width: var(--caller-cell-size);

@@ -4,8 +4,9 @@ type Props = {
   settings: BingoSettings;
   onChange: (settings: BingoSettings) => void;
   onGenerate: () => void;
-  onDownload: () => void;
+  onDownload: () => void | Promise<void>;
   canDownload: boolean;
+  isExporting: boolean;
 };
 
 export function SettingsForm({
@@ -14,6 +15,7 @@ export function SettingsForm({
   onGenerate,
   onDownload,
   canDownload,
+  isExporting,
 }: Props) {
   const update = <K extends keyof BingoSettings>(
     key: K,
@@ -45,6 +47,7 @@ export function SettingsForm({
           max={10}
           value={settings.gridSize}
           onChange={(e) => update("gridSize", Number(e.target.value))}
+          disabled={isExporting}
         />
       </div>
 
@@ -56,6 +59,7 @@ export function SettingsForm({
             value={settings.minNumber}
             onChange={(e) => update("minNumber", Number(e.target.value))}
             aria-label="Минимум"
+            disabled={isExporting}
           />
           <span>—</span>
           <input
@@ -63,6 +67,7 @@ export function SettingsForm({
             value={settings.maxNumber}
             onChange={(e) => update("maxNumber", Number(e.target.value))}
             aria-label="Максимум"
+            disabled={isExporting}
           />
         </div>
       </div>
@@ -75,6 +80,7 @@ export function SettingsForm({
           min={1}
           value={settings.cardCount}
           onChange={(e) => update("cardCount", Number(e.target.value))}
+          disabled={isExporting}
         />
       </div>
 
@@ -84,7 +90,7 @@ export function SettingsForm({
             id="freeCenter"
             type="checkbox"
             checked={settings.freeCenter}
-            disabled={freeDisabled}
+            disabled={freeDisabled || isExporting}
             onChange={(e) => update("freeCenter", e.target.checked)}
           />
           Центр Free
@@ -105,6 +111,7 @@ export function SettingsForm({
               e.target.value as BingoSettings["exportFormat"],
             )
           }
+          disabled={isExporting}
         >
           <option value="pdf">PDF</option>
           <option value="docx">Word (.docx)</option>
@@ -112,16 +119,16 @@ export function SettingsForm({
       </div>
 
       <div className="form-actions">
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary" disabled={isExporting}>
           Сгенерировать
         </button>
         <button
           type="button"
           className="btn btn-secondary"
-          disabled={!canDownload}
-          onClick={onDownload}
+          disabled={!canDownload || isExporting}
+          onClick={() => void onDownload()}
         >
-          Скачать
+          {isExporting ? "Создание файла…" : "Скачать"}
         </button>
       </div>
     </form>

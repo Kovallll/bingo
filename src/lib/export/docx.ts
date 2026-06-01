@@ -23,6 +23,8 @@ import {
   docxCallerLayout,
   getExportPages,
 } from "./layout";
+import type { ExportProgressCallback } from "./progress";
+import { yieldToMain } from "./progress";
 
 const fullBorder = {
   top: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
@@ -193,20 +195,30 @@ const sectionProperties = {
   },
 };
 
-export async function generateDocx(data: GeneratedBingo): Promise<Blob> {
+export async function generateDocx(
+  data: GeneratedBingo,
+  onProgress?: ExportProgressCallback,
+): Promise<Blob> {
   const children: (Paragraph | Table)[] = [];
   const pages = getExportPages(data);
   const perPage = cardsPerPage(data.settings.gridSize);
   const gridSize = data.settings.gridSize;
+  const totalPages = pages.length + 1;
 
-  pages.forEach((cards, pageIndex) => {
+  onProgress?.({ percent: 3, label: "Word: сборка карточек…" });
+
+  for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
+    const cards = pages[pageIndex]!;
+
     if (pageIndex > 0) {
       children.push(pageBreakParagraph());
     }
 
     const layout = docxBingoLayout(gridSize, cards.length);
 
-    cards.forEach((card, cardIndex) => {
+    for (let cardIndex = 0; cardIndex < cards.length; cardIndex++) {
+      const card = cards[cardIndex]!;
+
       if (cardIndex > 0 && perPage === 1) {
         children.push(pageBreakParagraph());
       } else if (cardIndex > 0) {
@@ -214,8 +226,17 @@ export async function generateDocx(data: GeneratedBingo): Promise<Blob> {
       }
 
       children.push(buildCardTable(card, layout));
+    }
+
+    onProgress?.({
+      percent: Math.round(5 + ((pageIndex + 1) / totalPages) * 75),
+      label: `Word: страница ${pageIndex + 1} / ${totalPages}`,
     });
-  });
+    await yieldToMain();
+  }
+
+  onProgress?.({ percent: 85, label: "Word: лист бочонков…" });
+  await yieldToMain();
 
   children.push(pageBreakParagraph());
   children.push(
@@ -227,6 +248,8 @@ export async function generateDocx(data: GeneratedBingo): Promise<Blob> {
       ),
     ),
   );
+
+  onProgress?.({ percent: 92, label: "Word: упаковка файла…" });
 
   const doc = new Document({
     styles: {
@@ -240,5 +263,7 @@ export async function generateDocx(data: GeneratedBingo): Promise<Blob> {
     sections: [{ properties: sectionProperties, children }],
   });
 
-  return Packer.toBlob(doc);
+  const blob = await Packer.toBlob(doc);
+  onProgress?.({ percent: 100, label: "Готово" });
+  return blob;
 }

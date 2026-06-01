@@ -1,14 +1,14 @@
 import { createRoot, type Root } from "react-dom/client";
 import { flushSync } from "react-dom";
-import { ExportDocument } from "../../components/ExportDocument";
-import type { GeneratedBingo } from "../../types";
+import type { ReactElement } from "react";
 
-export type ExportMount = {
-  container: HTMLElement;
+export type PageMount = {
+  pageElement: HTMLElement;
   unmount: () => void;
 };
 
-export function mountExportDocument(data: GeneratedBingo): ExportMount {
+/** Renders one export page off-screen (same CSS as preview). */
+export function mountExportPage(page: ReactElement): PageMount {
   const container = document.createElement("div");
   container.className = "export-mount";
   container.setAttribute("aria-hidden", "true");
@@ -17,11 +17,18 @@ export function mountExportDocument(data: GeneratedBingo): ExportMount {
   let root: Root | null = createRoot(container);
 
   flushSync(() => {
-    root!.render(<ExportDocument data={data} />);
+    root!.render(<div className="export-document">{page}</div>);
   });
 
+  const pageElement = container.querySelector<HTMLElement>(".export-page");
+  if (!pageElement) {
+    root.unmount();
+    container.remove();
+    throw new Error("Не удалось подготовить страницу для экспорта");
+  }
+
   return {
-    container,
+    pageElement,
     unmount: () => {
       root?.unmount();
       root = null;
